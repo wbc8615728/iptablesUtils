@@ -12,7 +12,7 @@ echo -e "${red}注意1${black}: 到域名的转发规则在添加后需要等待
 echo -e "${red}注意2${black}: 到IP的转发规则在重启后会失效，这是iptables的特性"
 echo
 setupService(){
-    wget -qO /usr/local/bin/dnat.sh https://raw.githubusercontent.com/arloor/iptablesUtils/master/dnat.sh||{
+    wget -qO /usr/local/bin/dnat.sh https://raw.githubusercontent.com/wbc8615728/iptablesUtils/master/dnat.sh||{
         echo "脚本不存在，请通过github提交issue通知作者"
         exit 1
     }
@@ -44,10 +44,10 @@ service dnat start > /dev/null 2>&1
 
 
 ## 获取本机地址
-localIP=""
+localIP=$(ip -o -4 addr list | grep -oP "inet \K([0-9]{1,3}[.]){3}[0-9]{3,3}")
+## localIP=$(ip -o -4 addr list | grep -Ev '\s(docker|lo)' | awk '{print $4}' | cut -d/ -f1 | grep -Ev '(^127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$)|(^10\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$)|(^172\.1[6-9]{1}[0-9]{0,1}\.[0-9]{1,3}\.[0-9]{1,3}$)|(^172\.2[0-9]{1}[0-9]{0,1}\.[0-9]{1,3}\.[0-9]{1,3}$)|(^172\.3[0-1]{1}[0-9]{0,1}\.[0-9]{1,3}\.[0-9]{1,3}$)|(^192\.168\.[0-9]{1,3}\.[0-9]{1,3}$)')
 if [ "${localIP}" = "" ]; then
-        echo -n "请输入本地ip:" ;read localIP
-        echo -n "本地ip为:${localIP}"
+        localIP=$(ip -o -4 addr list | grep -Ev '\s(docker|lo)' | awk '{print $4}' | cut -d/ -f1|head -n 1 )
 fi
 
 rmIptablesNat(){
